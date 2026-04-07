@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Đăng nhập - Quản lý Đối soát</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body
+    style="
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    "
+  >
+    <div style="width: 100%; max-width: 450px; padding: 20px">
+      <div style="text-align: center; margin-bottom: 25px">
+        <h2 style="color: var(--primary-color); font-size: 1.8rem">
+          <i class="fas fa-building"></i> Hệ thống Quản lý
+        </h2>
+        <p style="color: var(--text-muted); margin-top: 5px">
+          Đăng nhập để truy cập dữ liệu
+        </p>
+      </div>
+
+      <div class="card" id="form-login">
+        <h3
+          style="
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            color: var(--text-main);
+          "
+        >
+          Đăng nhập
+        </h3>
+        <form id="loginForm">
+          <label>Tài khoản Email</label>
+          <input
+            type="email"
+            id="login-email"
+            placeholder="VD: p101@hoasen.com"
+            required
+          />
+
+          <label>Mật khẩu</label>
+          <input
+            type="password"
+            id="login-password"
+            placeholder="Nhập mật khẩu"
+            required
+          />
+
+          <a
+            href="#"
+            onclick="switchForm('form-forgot')"
+            style="
+              display: block;
+              text-align: right;
+              font-size: 0.85rem;
+              margin: -5px 0 20px;
+            "
+            >Quên mật khẩu?</a
+          >
+
+          <button type="submit" class="btn btn-primary" id="btnLoginSubmit">
+            Đăng nhập
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline"
+            style="margin-top: 10px"
+            onclick="switchForm('form-register')"
+          >
+            Tạo tài khoản (Đăng ký mới)
+          </button>
+          <div style="text-align: center; margin-top: 15px">
+            <a
+              href="index.html"
+              style="font-size: 0.85rem; color: var(--text-muted)"
+              >&larr; Quay lại trang chủ</a
+            >
+          </div>
+        </form>
+      </div>
+
+      <div class="card" id="form-register" style="display: none">
+        <h3
+          style="
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            color: var(--text-main);
+          "
+        >
+          Đăng ký Tài khoản mới
+        </h3>
+        <form id="registerForm">
+          <label>Đăng ký cho khu vực</label>
+          <select id="reg-building" required>
+            <option value="">-- Đang tải danh sách khu vực... --</option>
+          </select>
+
+          <div style="display: flex; gap: 10px">
+            <div style="flex: 2">
+              <label>Họ và Tên</label
+              ><input type="text" id="reg-name" required />
+            </div>
+            <div style="flex: 1">
+              <label>Số phòng</label
+              ><input
+                type="text"
+                id="reg-room"
+                placeholder="VD: 101"
+                required
+              />
+            </div>
+          </div>
+
+          <label>Email đăng nhập</label>
+          <input type="email" id="reg-email" required />
+
+          <label>Mật khẩu</label>
+          <input type="password" id="reg-password" required />
+
+          <button type="submit" class="btn btn-primary" id="btnRegSubmit">
+            Gửi Đăng Ký (Cần duyệt)
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline"
+            style="margin-top: 10px"
+            onclick="switchForm('form-login')"
+          >
+            Quay lại Đăng nhập
+          </button>
+        </form>
+      </div>
+
+      <div class="card" id="form-forgot" style="display: none">
+        <h3 style="margin-bottom: 10px; color: var(--text-main)">
+          Khôi phục mật khẩu
+        </h3>
+        <p
+          style="
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+          "
+        >
+          Hệ thống sẽ gửi yêu cầu đặt lại mật khẩu vào Email của bạn.
+        </p>
+        <form id="forgotForm">
+          <label>Email đã đăng ký</label>
+          <input
+            type="email"
+            id="reset-email"
+            placeholder="Nhập Email của bạn"
+            required
+          />
+          <button type="submit" class="btn btn-primary">
+            Gửi mã khôi phục
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline"
+            style="margin-top: 10px"
+            onclick="switchForm('form-login')"
+          >
+            Hủy bỏ
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script type="module" src="js/auth.js"></script>
+
+    <script>
+      function switchForm(formId) {
+        document.getElementById("form-login").style.display = "none";
+        document.getElementById("form-register").style.display = "none";
+        document.getElementById("form-forgot").style.display = "none";
+        document.getElementById(formId).style.display = "block";
+      }
+    </script>
+  </body>
+</html>

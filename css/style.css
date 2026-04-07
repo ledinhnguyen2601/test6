@@ -1,0 +1,243 @@
+/* ========================================= */
+/* CSS CHUẨN DOANH NGHIỆP B2B - ĐÃ TỐI ƯU ĐỌC */
+/* ========================================= */
+:root {
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --bg-light: #f8fafc;
+  --bg-white: #ffffff;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --hover-gray: #f1f5f9;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, sans-serif;
+}
+body {
+  background-color: var(--bg-light);
+  color: var(--text-main);
+  line-height: 1.5;
+  font-size: 16px; /* Bơm phông chữ to hơn */
+}
+a {
+  text-decoration: none;
+  color: var(--primary-color);
+}
+a:hover {
+  text-decoration: underline;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.card {
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 25px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+/* Form & Input To Rõ Ràng */
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 1rem; /* Nâng size chữ */
+  outline: none;
+  transition: 0.2s;
+  background: var(--bg-white);
+  color: var(--text-main);
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+label {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  display: block;
+  color: var(--text-main);
+}
+
+/* Nút bấm (Buttons) */
+.btn {
+  display: inline-block;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  text-align: center;
+  transition: 0.2s;
+  width: 100%;
+  font-size: 1rem;
+}
+.btn-primary {
+  background: var(--primary-color);
+  color: white;
+}
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+.btn-outline {
+  background: white;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+}
+.btn-outline:hover {
+  background: var(--hover-gray);
+}
+
+/* Bảng biểu (Tables) */
+.table-responsive {
+  overflow-x: auto;
+  width: 100%;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  text-align: left;
+  min-width: 600px;
+}
+th,
+td {
+  padding: 15px 12px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 1rem;
+}
+th {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  background: var(--bg-light);
+  font-weight: 600;
+}
+tr:hover td {
+  background-color: var(--hover-gray);
+}
+
+/* Bố cục trang Admin & Tenant */
+.dashboard-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+.sidebar {
+  width: 260px;
+  background: var(--bg-white);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.sidebar-brand {
+  padding: 25px 20px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--primary-color);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.nav-menu {
+  list-style: none;
+  padding: 15px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+.nav-menu li a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 25px;
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 1rem;
+  transition: 0.2s;
+}
+.nav-menu li a:hover,
+.nav-menu li.active a {
+  background: var(--hover-gray);
+  color: var(--primary-color);
+  border-right: 4px solid var(--primary-color);
+}
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.topbar {
+  background: var(--bg-white);
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+.badge {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+/* ========================================= */
+/* TƯƠNG THÍCH MÀN HÌNH NHỎ (ĐIỆN THOẠI)     */
+/* ========================================= */
+@media (max-width: 768px) {
+  .dashboard-layout {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border-color);
+    border-right: none;
+  }
+  .nav-menu {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 0;
+  }
+  .nav-menu li a {
+    padding: 12px 15px;
+    border-right: none !important;
+    border-bottom: 3px solid transparent;
+  }
+  .nav-menu li.active a {
+    border-bottom: 3px solid var(--primary-color);
+    background: transparent;
+  }
+  .main-content {
+    overflow-y: visible;
+  }
+  .topbar {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+}

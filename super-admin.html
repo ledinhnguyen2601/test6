@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Chủ Nền Tảng QLDS System</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <aside class="sidebar" style="background: #0f172a; color: white">
+        <div
+          class="sidebar-brand"
+          style="color: #38bdf8; border-bottom: 1px solid #1e293b"
+        >
+          <i class="fas fa-server"></i> SUPER ADMIN
+        </div>
+        <ul class="nav-menu">
+          <li class="active">
+            <a href="#" style="color: #e2e8f0"
+              ><i class="fas fa-users-cog"></i> Xét duyệt Hệ thống</a
+            >
+          </li>
+        </ul>
+      </aside>
+      <main class="main-content">
+        <header
+          class="topbar"
+          style="background: #1e293b; color: white; border-bottom: none"
+        >
+          <h2 style="font-size: 1.1rem; color: white">
+            Hệ Thống Phân Quyền Trung Tâm
+          </h2>
+          <button
+            class="btn btn-primary logout-btn"
+            style="background: #ef4444; width: auto; padding: 5px 15px"
+          >
+            Đăng xuất
+          </button>
+        </header>
+
+        <div class="container" style="padding-top: 30px">
+          <div class="card">
+            <h3
+              style="
+                margin-bottom: 15px;
+                border-bottom: 1px solid var(--border-color);
+                padding-bottom: 10px;
+              "
+            >
+              Danh sách Tài khoản đăng ký toàn hệ thống
+            </h3>
+            <p
+              style="
+                color: var(--text-muted);
+                margin-bottom: 20px;
+                font-size: 0.9rem;
+              "
+            >
+              Tại đây, Chủ nền tảng cấp quyền (Role) cho các đối tác đăng ký làm
+              Chủ Trọ / BQL.
+            </p>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Họ Tên</th>
+                    <th>Email</th>
+                    <th>Khu Vực đăng ký</th>
+                    <th>Cấp Quyền (Role)</th>
+                    <th>Trạng thái (Status)</th>
+                    <th>Lưu</th>
+                  </tr>
+                </thead>
+                <tbody id="all-users-tbody">
+                  <tr>
+                    <td colspan="6" style="text-align: center">
+                      Đang kéo dữ liệu từ hệ thống...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script type="module">
+      import { auth, db } from "./js/firebase.js";
+      import {
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+      import {
+        doc,
+        getDoc,
+        collection,
+        getDocs,
+        updateDoc,
+      } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) return (window.location.href = "login.html");
+        const d = await getDoc(doc(db, "users", user.uid));
+        if (d.data().role !== "super_admin") {
+          alert("Bạn không có quyền truy cập trang này!");
+          window.location.href = "index.html";
+        }
+        loadAllUsers();
+      });
+
+      document
+        .querySelector(".logout-btn")
+        .addEventListener("click", () => signOut(auth));
+
+      async function loadAllUsers() {
+        const snap = await getDocs(collection(db, "users"));
+        const tbody = document.getElementById("all-users-tbody");
+        tbody.innerHTML = "";
+
+        snap.forEach((docSnap) => {
+          const item = docSnap.data();
+          // Bỏ qua không hiển thị chính tài khoản super_admin
+          if (item.role === "super_admin") return;
+
+          tbody.innerHTML += `
+                <tr>
+                    <td><strong>${item.name || "N/A"}</strong></td>
+                    <td>${item.email}</td>
+                    <td><span class="badge" style="background:#e0e7ff; color:#3730a3;">${item.building === "hoasen" ? "CC Hoa Sen" : item.building === "binhdan" ? "Trọ Bình Dân" : item.building}</span></td>
+                    <td>
+                        <select class="role-select" id="role-${docSnap.id}">
+                            <option value="tenant" ${item.role === "tenant" ? "selected" : ""}>Khách / Cư Dân</option>
+                            <option value="admin_motel" ${item.role === "admin_motel" ? "selected" : ""}>Admin Chủ Trọ</option>
+                            <option value="admin_apartment" ${item.role === "admin_apartment" ? "selected" : ""}>Admin BQL Chung Cư</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="status-select" id="status-${docSnap.id}">
+                            <option value="pending" ${item.status === "pending" ? "selected" : ""}>Chờ Duyệt (Pending)</option>
+                            <option value="active" ${item.status === "active" ? "selected" : ""}>Hoạt động (Active)</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="btn btn-primary btn-save" data-id="${docSnap.id}" style="padding: 6px 12px; font-size: 0.8rem; width: auto;"><i class="fas fa-save"></i> Cập nhật</button>
+                    </td>
+                </tr>`;
+        });
+
+        document.querySelectorAll(".btn-save").forEach((btn) => {
+          btn.addEventListener("click", async (e) => {
+            const id = e.target.closest("button").getAttribute("data-id");
+            const newRole = document.getElementById(`role-${id}`).value;
+            const newStatus = document.getElementById(`status-${id}`).value;
+
+            e.target.innerText = "...";
+            await updateDoc(doc(db, "users", id), {
+              role: newRole,
+              status: newStatus,
+            });
+            alert("Cập nhật phân quyền thành công!");
+            loadAllUsers();
+          });
+        });
+      }
+    </script>
+  </body>
+</html>

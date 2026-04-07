@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Cổng Đối Tác</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body
+    style="
+      background: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    "
+  >
+    <div class="card" style="max-width: 500px; width: 100%; padding: 40px">
+      <h2
+        style="
+          text-align: center;
+          color: var(--primary-color);
+          margin-bottom: 10px;
+        "
+      >
+        <i class="fas fa-handshake"></i> CỔNG ĐỐI TÁC
+      </h2>
+      <p
+        style="
+          text-align: center;
+          color: var(--text-muted);
+          margin-bottom: 30px;
+        "
+      >
+        Đăng ký mở hệ thống Quản lý Xóm trọ / Chung cư mới
+      </p>
+
+      <form id="partner-register-form">
+        <label>Họ tên Chủ Quản lý:</label>
+        <input type="text" id="p-name" required placeholder="Nguyễn Văn A" />
+
+        <label>Email đăng nhập:</label>
+        <input
+          type="email"
+          id="p-email"
+          required
+          placeholder="admin@example.com"
+        />
+
+        <label>Mật khẩu (Ít nhất 6 ký tự):</label>
+        <input type="password" id="p-pass" required placeholder="••••••••" />
+
+        <label>Tên Khu Trọ / Tòa nhà của bạn:</label>
+        <input
+          type="text"
+          id="p-building-name"
+          required
+          placeholder="VD: Trọ Sinh Viên 99 / CC Hoa Sen"
+        />
+
+        <label>Loại hình kinh doanh:</label>
+        <select id="p-type" required>
+          <option value="motel">Xóm Trọ / Phòng Trọ</option>
+          <option value="apartment">Chung Cư / Tòa nhà</option>
+        </select>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          style="margin-top: 20px; font-size: 1.1rem"
+        >
+          Tạo Hệ Thống Mới
+        </button>
+      </form>
+      <div style="text-align: center; margin-top: 20px">
+        <a href="login.html" style="font-size: 0.9rem; color: var(--text-muted)"
+          >Đã có tài khoản Đối tác? Đi tới Đăng nhập</a
+        >
+      </div>
+    </div>
+
+    <script type="module" src="js/partner.js"></script>
+  </body>
+</html>

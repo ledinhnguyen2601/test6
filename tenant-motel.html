@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Khách Thuê Trọ</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <aside class="sidebar">
+        <div class="sidebar-brand"><i class="fas fa-user"></i> Khách Thuê</div>
+        <ul class="nav-menu">
+          <li class="active">
+            <a href="#" onclick="switchTab('tab-hoadon', this)"
+              ><i class="fas fa-file-invoice-dollar"></i> Hóa đơn & Báo số</a
+            >
+          </li>
+          <li>
+            <a href="#" onclick="switchTab('tab-baoloi', this)"
+              ><i class="fas fa-tools"></i> Báo cáo Sự cố</a
+            >
+          </li>
+        </ul>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <h2
+            id="room-display"
+            style="font-size: 1.1rem; color: var(--text-main)"
+          >
+            Đang tải thông tin phòng...
+          </h2>
+          <div style="display: flex; align-items: center; gap: 15px">
+            <span id="user-name" style="font-size: 0.9rem; font-weight: 600"
+              >Đang tải...</span
+            >
+            <button
+              class="btn btn-outline logout-btn"
+              style="width: auto; padding: 5px 15px"
+            >
+              Đăng xuất
+            </button>
+          </div>
+        </header>
+
+        <div class="container" style="padding-top: 30px; max-width: 800px">
+          <div id="tab-hoadon" class="content-section">
+            <div class="card" style="margin-bottom: 20px">
+              <h3
+                style="
+                  margin-bottom: 15px;
+                  border-bottom: 1px solid var(--border-color);
+                  padding-bottom: 10px;
+                "
+              >
+                <i class="fas fa-bolt"></i> Khai báo Chỉ số Điện/Nước
+              </h3>
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 20px;
+                  margin-bottom: 15px;
+                "
+              >
+                <div
+                  style="
+                    background: var(--bg-light);
+                    padding: 15px;
+                    border-radius: 6px;
+                    border: 1px solid var(--border-color);
+                  "
+                >
+                  <strong style="display: block; margin-bottom: 10px"
+                    >CHỈ SỐ ĐIỆN</strong
+                  >
+                  <label>Số mới (Tháng này)</label>
+                  <input
+                    type="number"
+                    id="dien_moi"
+                    placeholder="Nhập số điện mới..."
+                  />
+                </div>
+                <div
+                  style="
+                    background: var(--bg-light);
+                    padding: 15px;
+                    border-radius: 6px;
+                    border: 1px solid var(--border-color);
+                  "
+                >
+                  <strong style="display: block; margin-bottom: 10px"
+                    >CHỈ SỐ NƯỚC</strong
+                  >
+                  <label>Số mới (Tháng này)</label>
+                  <input
+                    type="number"
+                    id="nuoc_moi"
+                    placeholder="Nhập số nước mới..."
+                  />
+                </div>
+              </div>
+              <label
+                >Tải ảnh chụp đồng hồ minh chứng (Bắt buộc để chủ trọ
+                duyệt)</label
+              >
+              <input
+                type="file"
+                id="meter-image"
+                accept="image/*"
+                style="border: none; padding: 0"
+              />
+              <button id="btnSubmitUtils" class="btn btn-primary">
+                Gửi dữ liệu Chốt sổ lên Quản lý
+              </button>
+            </div>
+          </div>
+
+          <div id="tab-baoloi" class="content-section" style="display: none">
+            <div class="card">
+              <h3
+                style="
+                  margin-bottom: 15px;
+                  border-bottom: 1px solid var(--border-color);
+                  padding-bottom: 10px;
+                "
+              >
+                <i class="fas fa-exclamation-triangle"></i> Gửi Yêu Cầu Hỗ Trợ /
+                Báo Lỗi
+              </h3>
+              <label>Phân loại sự cố</label>
+              <select id="issueType">
+                <option value="Sự cố Điện">Sự cố Điện</option>
+                <option value="Sự cố Nước">Sự cố Nước</option>
+                <option value="Khác">Khác</option>
+              </select>
+              <label>Chi tiết tình trạng</label>
+              <textarea
+                id="issueDesc"
+                rows="3"
+                placeholder="Mô tả cụ thể để thợ xử lý..."
+              ></textarea>
+              <button
+                id="btnSubmitReport"
+                class="btn btn-primary"
+                style="background: #ef4444"
+              >
+                Gửi Báo Cáo Sự Cố
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script type="module">
+      import { auth, db } from "./js/firebase.js";
+      import {
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+      import {
+        doc,
+        getDoc,
+        collection,
+        addDoc,
+      } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+      let userData = null;
+
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) return (window.location.href = "login.html");
+        const d = await getDoc(doc(db, "users", user.uid));
+        userData = d.data();
+        document.getElementById("user-name").innerText =
+          userData.name || "Khách Thuê";
+        document.getElementById("room-display").innerText =
+          "Phòng đang ở: " + userData.room;
+      });
+
+      document
+        .querySelector(".logout-btn")
+        .addEventListener("click", () => signOut(auth));
+
+      // XỬ LÝ UP ẢNH VÀ GỬI LÊN FIREBASE
+      document
+        .getElementById("btnSubmitUtils")
+        .addEventListener("click", async (e) => {
+          const dien = document.getElementById("dien_moi").value;
+          const nuoc = document.getElementById("nuoc_moi").value;
+          const fileInput = document.getElementById("meter-image");
+          const btn = e.target;
+
+          if (!dien || !nuoc)
+            return alert("Vui lòng nhập đầy đủ số điện và số nước!");
+          if (fileInput.files.length === 0)
+            return alert(
+              "Bắt buộc phải tải ảnh chụp đồng hồ lên để Chủ trọ đối chiếu!",
+            );
+
+          btn.innerText = "Đang mã hóa ảnh và gửi lên hệ thống...";
+
+          // Đọc ảnh thành Base64
+          const reader = new FileReader();
+          reader.onload = async function (event) {
+            const base64Image = event.target.result;
+
+            // Đẩy tất cả lên Firebase
+            await addDoc(collection(db, "utilities"), {
+              uid: auth.currentUser.uid,
+              room: userData.room,
+              building: userData.building,
+              dienMoi: dien,
+              nuocMoi: nuoc,
+              imageUrl: base64Image, // Lưu ảnh
+              status: "Chưa chốt",
+              date: new Date().toLocaleDateString("vi-VN"),
+              timestamp: Date.now(),
+            });
+
+            alert(
+              "Báo cáo chỉ số thành công! Chủ trọ có thể xem ảnh của bạn ngay bây giờ.",
+            );
+            btn.innerText = "Gửi dữ liệu Chốt sổ lên Quản lý";
+            document.getElementById("dien_moi").value = "";
+            document.getElementById("nuoc_moi").value = "";
+            fileInput.value = "";
+          };
+
+          reader.readAsDataURL(fileInput.files[0]); // Bắt đầu đọc ảnh
+        });
+
+      // Báo lỗi
+      document
+        .getElementById("btnSubmitReport")
+        .addEventListener("click", async (e) => {
+          const type = document.getElementById("issueType").value;
+          const desc = document.getElementById("issueDesc").value;
+          if (!desc) return alert("Nhập mô tả!");
+          await addDoc(collection(db, "reports"), {
+            uid: auth.currentUser.uid,
+            room: userData.room,
+            building: userData.building,
+            type: type,
+            description: desc,
+            status: "Tiếp nhận",
+            date: new Date().toLocaleDateString("vi-VN"),
+            timestamp: Date.now(),
+          });
+          alert("Đã gửi báo cáo lỗi!");
+          document.getElementById("issueDesc").value = "";
+        });
+
+      window.switchTab = function (tabId, element) {
+        document
+          .querySelectorAll(".content-section")
+          .forEach((sec) => (sec.style.display = "none"));
+        document
+          .querySelectorAll(".nav-menu li")
+          .forEach((li) => li.classList.remove("active"));
+        document.getElementById(tabId).style.display = "block";
+        element.parentElement.classList.add("active");
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cổng Cư Dân</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <aside class="sidebar">
+        <div class="sidebar-brand" style="color: #0f766e">
+          <i class="fas fa-user-circle"></i> Cổng Cư Dân
+        </div>
+        <ul class="nav-menu">
+          <li class="active">
+            <a href="#" onclick="switchTab('tab-bangtin', this)"
+              ><i class="fas fa-bullhorn"></i> Bảng tin Tòa nhà</a
+            >
+          </li>
+          <li>
+            <a href="#" onclick="switchTab('tab-hoadon', this)"
+              ><i class="fas fa-file-invoice"></i> Phí Quản lý & Hóa đơn</a
+            >
+          </li>
+          <li>
+            <a href="#" onclick="switchTab('tab-baoloi', this)"
+              ><i class="fas fa-exclamation-triangle"></i> Báo cáo sự cố</a
+            >
+          </li>
+        </ul>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <h2 id="room-display" style="font-size: 1.1rem">Đang tải...</h2>
+          <div style="display: flex; align-items: center; gap: 15px">
+            <span id="user-name" style="font-size: 1rem; font-weight: 600"
+              >Đang tải...</span
+            >
+            <button
+              class="btn btn-outline logout-btn"
+              style="width: auto; padding: 5px 15px"
+            >
+              Đăng xuất
+            </button>
+          </div>
+        </header>
+
+        <div class="container" style="padding-top: 30px; max-width: 800px">
+          <div id="tab-bangtin" class="content-section">
+            <h3
+              style="
+                margin-bottom: 15px;
+                border-bottom: 2px solid #0f766e;
+                display: inline-block;
+                padding-bottom: 5px;
+              "
+            >
+              Bảng tin từ Ban Quản Lý
+            </h3>
+            <div class="card" style="border-left: 4px solid #0f766e">
+              <strong
+                style="
+                  font-size: 1.1rem;
+                  color: var(--text-main);
+                  display: block;
+                "
+                >Thông báo vệ sinh bể nước ngầm định kỳ</strong
+              >
+              <span style="font-size: 0.9rem; color: var(--text-muted)"
+                >20/03/2026</span
+              >
+              <p
+                style="
+                  color: var(--text-muted);
+                  margin-top: 10px;
+                  font-size: 1rem;
+                "
+              >
+                BQL xin thông báo lịch thau rửa bể nước ngầm vào Chủ nhật tuần
+                này.
+              </p>
+            </div>
+          </div>
+
+          <div id="tab-hoadon" class="content-section" style="display: none">
+            <div class="card">
+              <h3
+                style="
+                  margin-bottom: 15px;
+                  color: var(--text-main);
+                  border-bottom: 1px solid var(--border-color);
+                  padding-bottom: 10px;
+                "
+              >
+                <i class="fas fa-file-invoice"></i> Hóa đơn của Căn hộ
+              </h3>
+              <div id="my-bill-container">
+                <p
+                  style="
+                    color: var(--text-muted);
+                    text-align: center;
+                    padding: 20px;
+                  "
+                >
+                  Đang tải thông tin hóa đơn...
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-baoloi" class="content-section" style="display: none">
+            <div class="card">
+              <h3
+                style="
+                  margin-bottom: 15px;
+                  color: var(--text-main);
+                  border-bottom: 1px solid var(--border-color);
+                  padding-bottom: 10px;
+                "
+              >
+                <i class="fas fa-tools"></i> Gửi Yêu Cầu Hỗ Trợ / Báo Lỗi
+              </h3>
+              <label>Phân loại sự cố</label>
+              <select
+                id="issueType"
+                onchange="
+                  document.getElementById('otherIssue').style.display =
+                    this.value === 'Khác' ? 'block' : 'none'
+                "
+              >
+                <option value="Thang máy">
+                  Thang máy (Kẹt, hỏng nút bấm...)
+                </option>
+                <option value="Sự cố Điện">
+                  Sự cố Điện (Chập, cháy bóng hành lang...)
+                </option>
+                <option value="Sự cố Nước">
+                  Sự cố Nước (Rò rỉ, mất nước...)
+                </option>
+                <option value="Mạng Internet">
+                  Mạng Internet / Wifi chung
+                </option>
+                <option value="An ninh">
+                  An ninh trật tự (Ồn ào, mất đồ...)
+                </option>
+                <option value="Vệ sinh">
+                  Vệ sinh chung (Hành lang rác...)
+                </option>
+                <option value="Khác">Vấn đề Khác...</option>
+              </select>
+              <div id="otherIssue" style="display: none">
+                <label>Vui lòng ghi rõ lỗi:</label>
+                <input
+                  type="text"
+                  id="otherIssueText"
+                  placeholder="Nhập vấn đề của bạn..."
+                />
+              </div>
+              <label>Chi tiết tình trạng / Yêu cầu</label>
+              <textarea
+                id="issueDesc"
+                rows="3"
+                placeholder="Mô tả cụ thể để BQL dễ dàng nắm bắt..."
+              ></textarea>
+              <button
+                id="btnSubmitReport"
+                class="btn btn-primary"
+                style="background: #0f766e"
+              >
+                Gửi báo cáo sự cố
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script type="module">
+      import { auth, db } from "./js/firebase.js";
+      import {
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+      import {
+        doc,
+        getDoc,
+        collection,
+        getDocs,
+        query,
+        where,
+        addDoc,
+      } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+      let userData = null;
+
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) return (window.location.href = "login.html");
+        const d = await getDoc(doc(db, "users", user.uid));
+        userData = d.data();
+        document.getElementById("user-name").innerText =
+          userData.name || "Cư Dân";
+        document.getElementById("room-display").innerText =
+          "Căn hộ: " + userData.room;
+
+        // KÉO DỮ LIỆU HÓA ĐƠN THẬT TỪ DATABASE VỀ
+        loadMyBill();
+      });
+
+      document
+        .querySelector(".logout-btn")
+        .addEventListener("click", () => signOut(auth));
+
+      // Hàm lấy hóa đơn
+      async function loadMyBill() {
+        const q = query(
+          collection(db, "apartment_bills"),
+          where("building", "==", userData.building),
+          where("room", "==", userData.room),
+        );
+        const snap = await getDocs(q);
+        const container = document.getElementById("my-bill-container");
+
+        if (snap.empty) {
+          container.innerHTML = `<p style="color: #10b981; text-align: center; padding: 20px; background: #d1fae5; border-radius: 8px;">Hiện tại BQL chưa phát hóa đơn cho căn hộ của bạn.</p>`;
+          return;
+        }
+
+        let html = "";
+        snap.forEach((d) => {
+          const data = d.data();
+          html += `
+                <div style="border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 15px; background: var(--bg-light);">
+                    <p style="margin-bottom: 10px; color: var(--text-muted);">Ngày lập: <strong>${data.date}</strong></p>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>Phí quản lý:</span> <strong>${data.fee.toLocaleString("vi-VN")} đ</strong></div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>Phí gửi xe:</span> <strong>${data.parking.toLocaleString("vi-VN")} đ</strong></div>
+                    <hr style="margin: 15px 0; border-top: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; font-size: 1.3rem;"><span>Tổng cộng:</span> <strong style="color: #ef4444;">${data.total.toLocaleString("vi-VN")} đ</strong></div>
+                    <div style="margin-top: 15px;"><span class="badge" style="background: #fef3c7; color: #d97706; padding: 6px 12px;">${data.status}</span></div>
+                </div>`;
+        });
+        container.innerHTML = html;
+      }
+
+      // Gửi Báo Lỗi
+      document
+        .getElementById("btnSubmitReport")
+        .addEventListener("click", async (e) => {
+          let type = document.getElementById("issueType").value;
+          if (type === "Khác") {
+            type = document.getElementById("otherIssueText").value;
+            if (!type) return alert("Vui lòng ghi rõ!");
+          }
+          const desc = document.getElementById("issueDesc").value;
+          const btn = e.target;
+          if (!desc) return alert("Vui lòng nhập mô tả chi tiết!");
+
+          btn.innerText = "Đang gửi lên Ban Quản Lý...";
+          await addDoc(collection(db, "reports"), {
+            uid: auth.currentUser.uid,
+            room: userData.room,
+            building: userData.building,
+            type: type,
+            description: desc,
+            status: "Tiếp nhận",
+            date: new Date().toLocaleDateString("vi-VN"),
+            timestamp: Date.now(),
+          });
+          alert("Đã gửi báo cáo thành công! Ban Quản Lý sẽ sớm xử lý.");
+          btn.innerText = "Gửi báo cáo sự cố";
+          document.getElementById("issueDesc").value = "";
+          document.getElementById("otherIssueText").value = "";
+        });
+
+      window.switchTab = function (tabId, element) {
+        document
+          .querySelectorAll(".content-section")
+          .forEach((sec) => (sec.style.display = "none"));
+        document
+          .querySelectorAll(".nav-menu li")
+          .forEach((li) => li.classList.remove("active"));
+        document.getElementById(tabId).style.display = "block";
+        element.parentElement.classList.add("active");
+      };
+    </script>
+  </body>
+</html>
