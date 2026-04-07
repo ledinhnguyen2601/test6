@@ -28,6 +28,7 @@ onAuthStateChanged(auth, async (user) => {
     userData.name || "BQL Admin";
   document.getElementById("building-display").innerText =
     "Hệ thống: " + userData.building;
+  loadPendingTenants(); // Tự động load khách chờ
   loadReports();
   loadResidents();
   loadVehicles();
@@ -37,6 +38,52 @@ onAuthStateChanged(auth, async (user) => {
 document
   .querySelector(".logout-btn")
   .addEventListener("click", () => signOut(auth));
+
+// --- HÀM DUYỆT KHÁCH CHỜ ---
+async function loadPendingTenants() {
+  const snap = await getDocs(
+    query(
+      collection(db, "users"),
+      where("building", "==", userData.building),
+      where("role", "==", "tenant"),
+      where("status", "==", "pending"),
+    ),
+  );
+  const tbody = document.getElementById("pending-tenants-tbody");
+  if (!tbody) return;
+  tbody.innerHTML = snap.empty
+    ? `<tr><td colspan="4" style="text-align: center;">Hiện không có khách nào chờ duyệt.</td></tr>`
+    : "";
+  snap.forEach((d) => {
+    const item = d.data();
+    tbody.innerHTML += `<tr>
+        <td><strong>${item.name || "Khách"}</strong></td>
+        <td>${item.room || "Chưa rõ"}</td>
+        <td>${item.email}</td>
+        <td>
+            <button class="btn btn-primary btn-duyet-khach" data-id="${d.id}" style="padding:4px 8px; width:auto; margin-right: 5px;">Duyệt</button>
+            <button class="btn btn-outline btn-tu-choi" data-id="${d.id}" style="padding:4px 8px; width:auto; color:red; border-color:red;">Từ chối</button>
+        </td>
+    </tr>`;
+  });
+  document.querySelectorAll(".btn-duyet-khach").forEach((btn) =>
+    btn.addEventListener("click", async (e) => {
+      btn.innerText = "Đang duyệt...";
+      await updateDoc(doc(db, "users", e.target.getAttribute("data-id")), {
+        status: "active",
+      });
+      loadPendingTenants();
+    }),
+  );
+  document.querySelectorAll(".btn-tu-choi").forEach((btn) =>
+    btn.addEventListener("click", async (e) => {
+      if (confirm("Xóa hồ sơ đăng ký của khách này?")) {
+        await deleteDoc(doc(db, "users", e.target.getAttribute("data-id")));
+        loadPendingTenants();
+      }
+    }),
+  );
+}
 
 document
   .getElementById("btnAddResident")
@@ -271,22 +318,22 @@ document
       return alert("Vui lòng nhập Tên, Địa chỉ và SĐT!");
     const btn = e.target;
     btn.innerText = "Đang tải dữ liệu...";
-
+    const updateData = {
+      name: pName,
+      address: pAddress,
+      phone: pPhone,
+      description: pDesc,
+      type: "apartment",
+      status: "active",
+    };
     if (fileInput.files.length > 0) {
       const reader = new FileReader();
       reader.readAsDataURL(fileInput.files[0]);
       reader.onload = async function (event) {
+        updateData.imageUrl = event.target.result;
         await setDoc(
           doc(db, "building_profiles", userData.building),
-          {
-            name: pName,
-            address: pAddress,
-            phone: pPhone,
-            description: pDesc,
-            imageUrl: event.target.result,
-            type: "apartment",
-            status: "active", // Mở khóa
-          },
+          updateData,
           { merge: true },
         );
         alert("Đã công khai lên Trang Chủ!");
@@ -296,14 +343,7 @@ document
     } else {
       await setDoc(
         doc(db, "building_profiles", userData.building),
-        {
-          name: pName,
-          address: pAddress,
-          phone: pPhone,
-          description: pDesc,
-          type: "apartment",
-          status: "active", // Mở khóa
-        },
+        updateData,
         { merge: true },
       );
       alert("Đã công khai lên Trang Chủ!");

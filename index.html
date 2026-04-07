@@ -9,8 +9,10 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
   </head>
-  <body>
-    <div class="main-wrap">
+  <body
+    style="display: flex; flex-direction: column; min-height: 100vh; margin: 0"
+  >
+    <div class="main-wrap" style="flex: 1">
       <nav
         style="
           background: white;
@@ -37,21 +39,13 @@
           </div>
           <div style="display: flex; gap: 15px">
             <a href="login.html" class="btn btn-outline" style="width: auto"
-              ><i class="fas fa-user"></i>Người Dùng</a
+              ><i class="fas fa-user"></i> Cổng Người Dùng</a
             >
-
             <a
               href="partner.html"
               class="btn btn-primary"
               style="width: auto; background: #d97706"
               ><i class="fas fa-handshake"></i> Trở thành Đối tác</a
-            >
-
-            <a
-              href="super-admin.html"
-              style="font-size: 0.8rem; color: #cbd5e1; align-self: center"
-              title="Hệ thống Quản trị Lõi"
-              >System</a
             >
           </div>
         </div>
@@ -86,6 +80,8 @@
               font-size: 1.1rem;
               box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
               border: 1px solid #cbd5e1;
+              width: 100%;
+              height: 50px;
             "
           />
           <i
@@ -93,7 +89,7 @@
             style="
               position: absolute;
               left: 18px;
-              top: 15px;
+              top: 16px;
               color: var(--text-muted);
               font-size: 1.2rem;
             "
@@ -104,7 +100,7 @@
           id="public-buildings-list"
           style="
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
           "
         >
@@ -115,11 +111,52 @@
               color: var(--text-muted);
             "
           >
-            Đang tải danh sách các khu trọ và chung cư...
+            Đang tải danh sách...
           </div>
         </div>
       </div>
     </div>
+
+    <footer
+      style="
+        background: white;
+        border-top: 1px solid var(--border-color);
+        padding: 30px 0;
+        margin-top: auto;
+      "
+    >
+      <div
+        class="container"
+        style="text-align: center; color: var(--text-muted)"
+      >
+        <h4
+          style="
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+          "
+        >
+          <i class="fas fa-shield-alt"></i>Quản Lý Đối Soát
+        </h4>
+        <p style="margin-bottom: 5px">
+          Được phát triển bởi: <strong>Lê Đình Nguyên</strong> -Khoa CNTT
+        </p>
+        <p style="margin-bottom: 5px">
+          <i class="fas fa-map-marker-alt" style="color: #ef4444"></i> Vạn An,
+          Nghệ An
+        </p>
+        <div
+          style="
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #cbd5e1;
+            font-size: 0.9rem;
+          "
+        >
+          &copy; 2026 Bản quyền hệ thống thuộc về tác giả Nguyên
+        </div>
+      </div>
+    </footer>
 
     <script type="module">
       import { auth, db } from "./js/firebase.js";
@@ -142,7 +179,7 @@
 
         snap.forEach((docSnap) => {
           const item = docSnap.data();
-          if (item.status !== "active") return; // LỌC CHẶN RÁC Ở ĐÂY
+          if (item.status !== "active") return;
 
           hasActive = true;
           const defaultImg =
@@ -153,14 +190,14 @@
               : '<span class="badge" style="background:#e0e7ff; color:#3730a3;">Chung Cư</span>';
 
           listContainer.innerHTML += `
-            <div class="card building-item" style="padding: 0; overflow: hidden;">
+            <div class="card building-item" onclick="window.location.href='login.html'" style="padding: 0; overflow: hidden; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
                 <img src="${item.imageUrl || defaultImg}" style="width: 100%; height: 200px; object-fit: cover; border-bottom: 1px solid #e2e8f0;">
                 <div style="padding: 20px;">
                     <h3 class="building-name" style="margin-bottom: 10px; color: var(--text-main); font-size: 1.2rem;">${item.name}</h3>
                     <div style="margin-bottom: 15px;">${typeLabel}</div>
                     <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 8px;"><i class="fas fa-map-marker-alt" style="width: 20px; color: #ef4444;"></i> ${item.address}</p>
                     <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 8px;"><i class="fas fa-phone-alt" style="width: 20px; color: #10b981;"></i> ${item.phone}</p>
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #cbd5e1;">${item.description}</p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #cbd5e1;">${item.description || "Chưa có mô tả"}</p>
                 </div>
             </div>`;
         });
@@ -169,7 +206,6 @@
           listContainer.innerHTML = `<div style="text-align: center; grid-column: 1 / -1; color: #ef4444;">Hệ thống đang cập nhật dữ liệu.</div>`;
         }
 
-        // Tính năng tìm kiếm động
         document
           .getElementById("searchInput")
           .addEventListener("keyup", function () {

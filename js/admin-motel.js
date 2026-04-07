@@ -26,6 +26,7 @@ onAuthStateChanged(auth, async (user) => {
   userData = d.data();
   document.getElementById("admin-name").innerText =
     userData.name || "Chủ Trọ Admin";
+  loadPendingTenants(); // Tự động load khách chờ
   loadUtilities();
   loadReports();
   loadRooms();
@@ -35,6 +36,53 @@ document
   .querySelector(".logout-btn")
   .addEventListener("click", () => signOut(auth));
 
+// --- HÀM DUYỆT KHÁCH CHỜ ---
+async function loadPendingTenants() {
+  const snap = await getDocs(
+    query(
+      collection(db, "users"),
+      where("building", "==", userData.building),
+      where("role", "==", "tenant"),
+      where("status", "==", "pending"),
+    ),
+  );
+  const tbody = document.getElementById("pending-tenants-tbody");
+  if (!tbody) return;
+  tbody.innerHTML = snap.empty
+    ? `<tr><td colspan="4" style="text-align: center;">Hiện không có khách nào chờ duyệt.</td></tr>`
+    : "";
+  snap.forEach((d) => {
+    const item = d.data();
+    tbody.innerHTML += `<tr>
+        <td><strong>${item.name || "Khách"}</strong></td>
+        <td>${item.room || "Chưa rõ"}</td>
+        <td>${item.email}</td>
+        <td>
+            <button class="btn btn-primary btn-duyet-khach" data-id="${d.id}" style="padding:4px 8px; width:auto; margin-right: 5px;">Duyệt</button>
+            <button class="btn btn-outline btn-tu-choi" data-id="${d.id}" style="padding:4px 8px; width:auto; color:red; border-color:red;">Từ chối</button>
+        </td>
+    </tr>`;
+  });
+  document.querySelectorAll(".btn-duyet-khach").forEach((btn) =>
+    btn.addEventListener("click", async (e) => {
+      btn.innerText = "Đang duyệt...";
+      await updateDoc(doc(db, "users", e.target.getAttribute("data-id")), {
+        status: "active",
+      });
+      loadPendingTenants();
+    }),
+  );
+  document.querySelectorAll(".btn-tu-choi").forEach((btn) =>
+    btn.addEventListener("click", async (e) => {
+      if (confirm("Xóa hồ sơ đăng ký của khách này?")) {
+        await deleteDoc(doc(db, "users", e.target.getAttribute("data-id")));
+        loadPendingTenants();
+      }
+    }),
+  );
+}
+
+// --- CÁC HÀM CŨ GIỮ NGUYÊN (TRÁNH LỖI) ---
 async function loadUtilities() {
   const snap = await getDocs(
     query(
@@ -52,7 +100,7 @@ async function loadUtilities() {
     const imgBtn = item.imageUrl
       ? `<button class="btn btn-outline btn-view-img" data-img="${item.imageUrl}" style="padding: 6px; width: auto;"><i class="fas fa-image"></i></button>`
       : `Không ảnh`;
-    tbody.innerHTML += `<tr><td><strong>${item.room}</strong></td><td>${item.date}</td><td><strong>${item.dienMoi}</strong></td><td><strong>${item.nuocMoi}</strong></td><td>${imgBtn}</td><td>${isChot ? '<span class="badge" style="background:#d1fae5;color:#10b981;">Đã chốt</span>' : '<span class="badge" style="background:#fef3c7;color:#d97706;">Chờ duyệt</span>'}</td><td>${isChot ? '<button class="btn btn-outline" disabled>Đã duyệt</button>' : `<button class="btn btn-primary btn-duyet" data-id="${docSnap.id}">Duyệt</button>`}</td></tr>`;
+    tbody.innerHTML += `<tr><td><strong>${item.room}</strong></td><td>${item.date}</td><td><strong>${item.dienMoi}</strong></td><td><strong>${item.nuocMoi}</strong></td><td>${imgBtn}</td><td>${isChot ? '<span class="badge" style="background:#d1fae5;color:#10b981;">Đã chốt</span>' : '<span class="badge" style="background:#fef3c7;color:#d97706;">Chờ duyệt</span>'}</td><td>${isChot ? '<button class=\"btn btn-outline\" disabled>Đã duyệt</button>' : `<button class=\"btn btn-primary btn-duyet\" data-id=\"${docSnap.id}\">Duyệt</button>`}</td></tr>`;
   });
   document.querySelectorAll(".btn-view-img").forEach((btn) =>
     btn.addEventListener("click", (e) => {
@@ -111,11 +159,9 @@ async function loadRooms() {
     }
     tbody.innerHTML += `<tr><td><strong>${item.room}</strong></td><td>${Number(item.price).toLocaleString("vi-VN")} đ</td><td>${item.tenant || "-"}</td><td>${item.status}</td><td><button class="btn btn-outline btn-del-room" data-id="${d.id}" style="color:red; padding:4px 8px; width:auto;">Xóa</button></td></tr>`;
   });
-
   document.getElementById("stat-revenue").innerText =
     totalRev.toLocaleString("vi-VN") + " đ";
   document.getElementById("stat-rented").innerText = rentedCount + " Phòng";
-
   if (roomChartInstance) roomChartInstance.destroy();
   roomChartInstance = new Chart(document.getElementById("roomStatusChart"), {
     type: "doughnut",
@@ -129,7 +175,6 @@ async function loadRooms() {
       ],
     },
   });
-
   if (revenueChartInstance) revenueChartInstance.destroy();
   revenueChartInstance = new Chart(document.getElementById("revenueChart"), {
     type: "bar",
@@ -140,7 +185,6 @@ async function loadRooms() {
       ],
     },
   });
-
   document.querySelectorAll(".btn-del-room").forEach((btn) =>
     btn.addEventListener("click", async (e) => {
       if (confirm("Xóa phòng này?")) {
@@ -191,22 +235,22 @@ document
       return alert("Vui lòng nhập Tên, Địa chỉ, SĐT!");
     const btn = e.target;
     btn.innerText = "Đang tải dữ liệu...";
-
+    const updateData = {
+      name: pName,
+      address: pAddress,
+      phone: pPhone,
+      description: pDesc,
+      type: "motel",
+      status: "active",
+    };
     if (fileInput.files.length > 0) {
       const reader = new FileReader();
       reader.readAsDataURL(fileInput.files[0]);
       reader.onload = async function (event) {
+        updateData.imageUrl = event.target.result;
         await setDoc(
           doc(db, "building_profiles", userData.building),
-          {
-            name: pName,
-            address: pAddress,
-            phone: pPhone,
-            description: pDesc,
-            imageUrl: event.target.result,
-            type: "motel",
-            status: "active", // Mở khóa
-          },
+          updateData,
           { merge: true },
         );
         alert("Đã công khai lên Trang Chủ!");
@@ -216,14 +260,7 @@ document
     } else {
       await setDoc(
         doc(db, "building_profiles", userData.building),
-        {
-          name: pName,
-          address: pAddress,
-          phone: pPhone,
-          description: pDesc,
-          type: "motel",
-          status: "active", // Mở khóa
-        },
+        updateData,
         { merge: true },
       );
       alert("Đã công khai lên Trang Chủ!");

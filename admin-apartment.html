@@ -30,173 +30,174 @@
           </li>
           <li>
             <a href="#" onclick="switchTab('tab-xe', this)"
-              ><i class="fas fa-car"></i> Quản lý Bãi Xe</a
+              ><i class="fas fa-car"></i> Phương Tiện</a
             >
           </li>
           <li>
             <a href="#" onclick="switchTab('tab-hoadon', this)"
-              ><i class="fas fa-file-invoice-dollar"></i> Quản lý Hóa Đơn</a
+              ><i class="fas fa-file-invoice-dollar"></i> Phát Hóa Đơn</a
             >
           </li>
           <li>
-            <a href="#" onclick="switchTab('tab-baohong', this)"
-              ><i class="fas fa-wrench"></i> Yêu cầu hỗ trợ</a
+            <a href="#" onclick="switchTab('tab-suachua', this)"
+              ><i class="fas fa-tools"></i> Tiếp nhận Sự cố</a
             >
           </li>
           <li>
-            <a href="#" onclick="switchTab('tab-hoso', this)"
-              ><i class="fas fa-info-circle"></i> Cài đặt Trang chủ</a
+            <a href="#" onclick="switchTab('tab-profile', this)"
+              ><i class="fas fa-store"></i> Cài đặt Trang chủ</a
             >
           </li>
         </ul>
       </aside>
       <main class="main-content">
         <header class="topbar">
-          <h2 id="building-display" style="font-size: 1.1rem">Đang tải...</h2>
-          <div style="display: flex; align-items: center; gap: 15px">
-            <span id="admin-name" style="font-weight: 600; font-size: 0.9rem"
-              >BQL Admin</span
+          <div>
+            <h2 style="margin: 0">Bảng điều khiển Tòa Nhà</h2>
+            <div
+              id="building-display"
+              style="
+                font-size: 0.9rem;
+                color: var(--text-muted);
+                margin-top: 5px;
+              "
+            >
+              Đang tải...
+            </div>
+          </div>
+          <div style="display: flex; gap: 15px; align-items: center">
+            <span
+              id="admin-name"
+              style="font-weight: bold; color: var(--primary-color)"
+              >Đang tải...</span
             >
             <button
               class="btn btn-outline logout-btn"
-              style="padding: 5px 10px; font-size: 0.85rem; width: auto"
+              style="width: auto; padding: 5px 15px"
             >
               Đăng xuất
             </button>
           </div>
         </header>
-
-        <div class="container" style="padding-top: 20px">
-          <div id="tab-dashboard" class="content-section">
+        <div class="container" style="padding-top: 30px">
+          <div
+            id="tab-dashboard"
+            class="content-section"
+            style="display: block"
+          >
             <div
-              style="
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 20px;
-                margin-bottom: 20px;
-              "
+              class="card"
+              style="margin-bottom: 20px; border-left: 5px solid #f59e0b"
             >
-              <div
-                class="card"
-                style="border-left: 4px solid var(--primary-color)"
-              >
-                <label>Tổng Cư dân</label>
-                <h3
-                  id="stat-res"
-                  style="font-size: 1.8rem; color: var(--primary-color)"
-                >
-                  0 Người
-                </h3>
-              </div>
-              <div class="card" style="border-left: 4px solid #8b5cf6">
-                <label>Tổng Phương tiện</label>
-                <h3 id="stat-veh" style="font-size: 1.8rem; color: #8b5cf6">
-                  0 Xe
-                </h3>
-              </div>
-              <div class="card" style="border-left: 4px solid #d97706">
-                <label>Bill chờ thu</label>
-                <h3 id="stat-bill" style="font-size: 1.8rem; color: #d97706">
-                  0 Hóa đơn
-                </h3>
+              <h3 style="color: #d97706; margin-bottom: 15px">
+                <i class="fas fa-user-clock"></i> Cư dân chờ phê duyệt
+              </h3>
+              <div class="table-responsive">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Họ Tên</th>
+                      <th>Căn hộ đăng ký</th>
+                      <th>Email/SĐT</th>
+                      <th>Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody id="pending-tenants-tbody">
+                    <tr>
+                      <td colspan="4" style="text-align: center">
+                        Đang tải...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
-            <div
-              style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px"
-            >
-              <div class="card">
-                <h3
-                  style="
-                    margin-bottom: 15px;
-                    font-size: 1rem;
-                    color: var(--text-muted);
-                    text-align: center;
-                  "
+
+            <div style="display: flex; gap: 20px; margin-bottom: 30px">
+              <div class="card" style="flex: 1; text-align: center">
+                <h4 style="color: var(--text-muted); margin-bottom: 10px">
+                  Số Cư dân
+                </h4>
+                <h2
+                  id="stat-res"
+                  style="color: var(--primary-color); font-size: 2rem"
                 >
-                  TỶ LỆ PHƯƠNG TIỆN
-                </h3>
-                <canvas id="vehChart" style="max-height: 250px"></canvas>
+                  0
+                </h2>
               </div>
-              <div class="card">
-                <h3
-                  style="
-                    margin-bottom: 15px;
-                    font-size: 1rem;
-                    color: var(--text-muted);
-                    text-align: center;
-                  "
-                >
-                  TÌNH TRẠNG THU PHÍ
-                </h3>
-                <canvas id="billChart" style="max-height: 250px"></canvas>
+              <div class="card" style="flex: 1; text-align: center">
+                <h4 style="color: var(--text-muted); margin-bottom: 10px">
+                  Phương tiện
+                </h4>
+                <h2 id="stat-veh" style="color: #10b981; font-size: 2rem">0</h2>
+              </div>
+              <div class="card" style="flex: 1; text-align: center">
+                <h4 style="color: var(--text-muted); margin-bottom: 10px">
+                  Hóa đơn nợ
+                </h4>
+                <h2 id="stat-bill" style="color: #ef4444; font-size: 2rem">
+                  0
+                </h2>
+              </div>
+            </div>
+            <div style="display: flex; gap: 20px; margin-bottom: 30px">
+              <div class="card" style="flex: 1">
+                <h3 style="margin-bottom: 20px">Tỉ lệ Phương tiện</h3>
+                <canvas id="vehChart"></canvas>
+              </div>
+              <div class="card" style="flex: 1">
+                <h3 style="margin-bottom: 20px">Thống kê Hóa đơn</h3>
+                <canvas id="billChart"></canvas>
               </div>
             </div>
           </div>
 
           <div id="tab-cudan" class="content-section" style="display: none">
-            <div
-              class="card"
-              style="
-                margin-bottom: 20px;
-                background: var(--bg-light);
-                border: 1px dashed #0f766e;
-              "
-            >
-              <h3 style="margin-bottom: 15px; color: #0f766e">
-                <i class="fas fa-user-plus"></i> Thêm Cư Dân Mới
-              </h3>
-              <div
-                style="
-                  display: grid;
-                  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                  gap: 15px;
-                "
-              >
+            <div class="card" style="margin-bottom: 20px">
+              <h3 style="margin-bottom: 20px">Thêm Cư dân mới</h3>
+              <div style="display: flex; gap: 15px">
                 <input
                   type="text"
                   id="new-res-room"
-                  placeholder="Căn hộ"
-                /><input
+                  placeholder="Căn hộ (VD: A101)"
+                  style="flex: 1"
+                />
+                <input
                   type="text"
                   id="new-res-name"
-                  placeholder="Tên chủ hộ"
-                /><input
+                  placeholder="Họ tên Chủ hộ"
+                  style="flex: 1"
+                />
+                <input
                   type="text"
                   id="new-res-phone"
                   placeholder="Số điện thoại"
+                  style="flex: 1"
                 />
-              </div>
-              <button
-                id="btnAddResident"
-                class="btn btn-primary"
-                style="background: #0f766e; width: auto"
-              >
-                Lưu Cư Dân
-              </button>
-            </div>
-            <div class="card">
-              <div
-                style="
-                  display: flex;
-                  justify-content: space-between;
-                  margin-bottom: 15px;
-                "
-              >
-                <h3>Danh sách Cư Dân</h3>
                 <button
-                  class="btn btn-outline"
-                  style="width: auto; color: #10b981; border-color: #10b981"
-                  onclick="exportTableToExcel('resTable', 'DanhSach_CuDan')"
+                  id="btnAddResident"
+                  class="btn btn-primary"
+                  style="width: auto"
                 >
-                  <i class="fas fa-file-excel"></i> Xuất Excel
+                  Thêm
                 </button>
               </div>
+            </div>
+            <div class="card">
+              <h3 style="margin-bottom: 20px">Danh sách Cư dân</h3>
+              <button
+                class="btn btn-outline"
+                style="margin-bottom: 15px; width: auto"
+                onclick="exportTableToExcel('resTable', 'DanhSachCuDan')"
+              >
+                <i class="fas fa-file-excel"></i> Xuất Excel
+              </button>
               <div class="table-responsive">
                 <table id="resTable">
                   <thead>
                     <tr>
                       <th>Căn hộ</th>
-                      <th>Tên Chủ Hộ</th>
+                      <th>Họ Tên</th>
                       <th>Số điện thoại</th>
                       <th>Thao tác</th>
                     </tr>
@@ -214,43 +215,37 @@
           </div>
 
           <div id="tab-xe" class="content-section" style="display: none">
-            <div
-              class="card"
-              style="
-                margin-bottom: 20px;
-                background: var(--bg-light);
-                border: 1px dashed var(--primary-color);
-              "
-            >
-              <h3 style="margin-bottom: 15px; color: var(--primary-color)">
-                <i class="fas fa-motorcycle"></i> Đăng ký Biển số xe
-              </h3>
-              <div
-                style="
-                  display: grid;
-                  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                  gap: 15px;
-                "
-              >
+            <div class="card" style="margin-bottom: 20px">
+              <h3 style="margin-bottom: 20px">Đăng ký Phương tiện</h3>
+              <div style="display: flex; gap: 15px">
                 <input
                   type="text"
                   id="new-veh-room"
                   placeholder="Căn hộ"
-                /><input
+                  style="flex: 1"
+                />
+                <input
                   type="text"
                   id="new-veh-plate"
-                  placeholder="Biển số"
-                /><input type="text" id="new-veh-type" placeholder="Loại xe" />
+                  placeholder="Biển số (VD: 29A-12345)"
+                  style="flex: 1"
+                />
+                <select id="new-veh-type" style="flex: 1">
+                  <option value="Xe máy">Xe máy</option>
+                  <option value="Ô tô">Ô tô</option>
+                  <option value="Xe đạp/Khác">Xe đạp/Khác</option>
+                </select>
+                <button
+                  id="btnAddVehicle"
+                  class="btn btn-primary"
+                  style="width: auto"
+                >
+                  Đăng ký
+                </button>
               </div>
-              <button
-                id="btnAddVehicle"
-                class="btn btn-primary"
-                style="width: auto"
-              >
-                Thêm Phương Tiện
-              </button>
             </div>
             <div class="card">
+              <h3 style="margin-bottom: 20px">Danh sách Phương tiện</h3>
               <div class="table-responsive">
                 <table>
                   <thead>
@@ -274,81 +269,52 @@
           </div>
 
           <div id="tab-hoadon" class="content-section" style="display: none">
-            <div
-              class="card"
-              style="
-                margin-bottom: 20px;
-                background: var(--bg-light);
-                border: 1px dashed #d97706;
-              "
-            >
-              <div
-                style="
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                  margin-bottom: 15px;
-                "
-              >
-                <h3 style="color: #d97706">
-                  <i class="fas fa-plus-circle"></i> Phát Hóa Đơn
-                </h3>
-                <button
-                  id="btnAutoBill"
-                  class="btn btn-primary"
-                  style="background: #10b981; width: auto"
-                >
-                  <i class="fas fa-magic"></i> Tạo Hóa Đơn Hàng Loạt
-                </button>
-              </div>
-              <div
-                style="
-                  display: grid;
-                  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                  gap: 15px;
-                "
-              >
-                <input type="text" id="bill-room" placeholder="Căn hộ" /><input
+            <div class="card" style="margin-bottom: 20px">
+              <h3 style="margin-bottom: 20px">Phát Hóa đơn Quản lý</h3>
+              <div style="display: flex; gap: 15px; margin-bottom: 15px">
+                <input
+                  type="text"
+                  id="bill-room"
+                  placeholder="Căn hộ"
+                  style="flex: 1"
+                />
+                <input
                   type="number"
                   id="bill-fee"
-                  placeholder="Phí quản lý"
-                /><input
+                  placeholder="Phí quản lý (VNĐ)"
+                  style="flex: 1"
+                />
+                <input
                   type="number"
                   id="bill-parking"
-                  placeholder="Phí gửi xe"
+                  placeholder="Phí gửi xe (nếu có)"
+                  style="flex: 1"
                 />
+                <button
+                  id="btnCreateBill"
+                  class="btn btn-primary"
+                  style="width: auto"
+                >
+                  Tạo Bill lẻ
+                </button>
               </div>
               <button
-                id="btnCreateBill"
+                id="btnAutoBill"
                 class="btn btn-outline"
-                style="color: #d97706; border-color: #d97706; width: auto"
+                style="width: 100%"
               >
-                Phát Hóa Đơn Lẻ
+                <i class="fas fa-magic"></i> Tạo Hóa Đơn Hàng Loạt cho toàn bộ
+                Cư Dân
               </button>
             </div>
             <div class="card">
-              <div
-                style="
-                  display: flex;
-                  justify-content: space-between;
-                  margin-bottom: 15px;
-                "
-              >
-                <h3>Lịch sử Hóa Đơn</h3>
-                <button
-                  class="btn btn-outline"
-                  style="width: auto; color: #10b981; border-color: #10b981"
-                  onclick="exportTableToExcel('billTable', 'ThongKe_HoaDon')"
-                >
-                  <i class="fas fa-file-excel"></i> Xuất Excel
-                </button>
-              </div>
+              <h3 style="margin-bottom: 20px">Danh sách Hóa đơn</h3>
               <div class="table-responsive">
-                <table id="billTable">
+                <table>
                   <thead>
                     <tr>
                       <th>Căn hộ</th>
-                      <th>Ngày phát</th>
+                      <th>Tháng/Ngày</th>
                       <th>Tổng tiền</th>
                       <th>Trạng thái</th>
                       <th>Thao tác</th>
@@ -366,17 +332,18 @@
             </div>
           </div>
 
-          <div id="tab-baohong" class="content-section" style="display: none">
+          <div id="tab-suachua" class="content-section" style="display: none">
             <div class="card">
+              <h3 style="margin-bottom: 20px">Danh sách Sự cố báo cáo</h3>
               <div class="table-responsive">
                 <table>
                   <thead>
                     <tr>
                       <th>Căn hộ</th>
-                      <th>Ngày gửi</th>
+                      <th>Ngày báo</th>
                       <th>Loại sự cố</th>
-                      <th>Chi tiết</th>
-                      <th>Trạng thái</th>
+                      <th>Mô tả chi tiết</th>
+                      <th>Cập nhật trạng thái</th>
                     </tr>
                   </thead>
                   <tbody id="reports-tbody">
@@ -391,38 +358,26 @@
             </div>
           </div>
 
-          <div id="tab-hoso" class="content-section" style="display: none">
-            <div class="card" style="border-top: 4px solid #0f766e">
-              <h3 style="margin-bottom: 15px; color: #0f766e">
-                Cập nhật Thông tin Chung cư lên Trang Chủ
+          <div id="tab-profile" class="content-section" style="display: none">
+            <div class="card" style="max-width: 600px; margin: 0 auto">
+              <h3 style="margin-bottom: 20px">
+                Cài đặt Thông tin Hiển thị Public
               </h3>
-              <div
-                style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px"
-              >
-                <div>
-                  <label>Tên Chung Cư / Tòa nhà:</label
-                  ><input
-                    type="text"
-                    id="prof-name"
-                    placeholder="VD: Chung Cư Hoa Sen"
-                  />
-                </div>
-                <div>
-                  <label>Số điện thoại BQL:</label
-                  ><input
-                    type="text"
-                    id="prof-phone"
-                    placeholder="VD: 0912 345 678"
-                  />
-                </div>
-              </div>
-              <label>Địa chỉ cụ thể:</label
+              <label>Tên Chung Cư / Tòa Nhà:</label
+              ><input
+                type="text"
+                id="prof-name"
+                placeholder="VD: Chung Cư Bình Minh"
+              />
+              <label>Địa chỉ chi tiết:</label
               ><input
                 type="text"
                 id="prof-address"
                 placeholder="VD: Số 10, Ngõ 20..."
               />
-              <label>Mô tả tiện ích:</label
+              <label>Số điện thoại BQL:</label
+              ><input type="text" id="prof-phone" placeholder="VD: 0988..." />
+              <label>Mô tả chung:</label
               ><textarea
                 id="prof-desc"
                 rows="3"
@@ -465,7 +420,6 @@
         XLSX.writeFile(wb, filename + ".xlsx");
       }
     </script>
-
     <script type="module" src="js/admin-apartment.js"></script>
   </body>
 </html>
