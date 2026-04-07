@@ -104,15 +104,33 @@
       } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
       onAuthStateChanged(auth, async (user) => {
-        if (!user) return (window.location.href = "login.html");
-        const d = await getDoc(doc(db, "users", user.uid));
-        if (d.data().role !== "super_admin") {
-          alert("Bạn không có quyền truy cập trang này!");
-          window.location.href = "index.html";
+        // 1. Chưa đăng nhập -> Đá ra ngoài
+        if (!user) {
+          window.location.href = "login.html";
+          return;
         }
-        loadAllUsers();
-      });
 
+        // 2. Kéo thông tin xem có đúng là Trùm cuối không
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+
+          // KIỂM TRA CHUẨN XÁC CHỮ super_admin
+          if (userData.role !== "super_admin") {
+            alert("Sếp không có quyền vào cổng Quản trị lõi này!");
+            window.location.href = "login.html";
+            return;
+          }
+
+          // Đã qua ải bảo vệ, load dữ liệu trang Admin
+          document.getElementById("admin-name").innerText =
+            userData.name || "Super Admin";
+          loadPendingPartners();
+          // ... (các hàm load dữ liệu khác của trang super admin)
+        } else {
+          window.location.href = "login.html";
+        }
+      });
       document
         .querySelector(".logout-btn")
         .addEventListener("click", () => signOut(auth));
