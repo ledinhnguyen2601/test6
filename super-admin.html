@@ -2,7 +2,7 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <title>Super Admin-Chủ Nền Tảng</title>
+    <title>Super Admin - Chủ Nền Tảng</title>
     <link rel="stylesheet" href="css/style.css" />
     <link
       rel="stylesheet"
@@ -13,22 +13,22 @@
     <div class="dashboard-layout">
       <aside class="sidebar">
         <div class="sidebar-brand">
-          <i class="fas fa-crown"></i> SUPER ADMIN
+          <i class="fas fa-chess-king"></i> QUẢN TRỊ LÕI
         </div>
         <ul class="nav-menu">
           <li class="active">
-            <a href="#"><i class="fas fa-users-cog"></i> Phê duyệt Đối tác</a>
+            <a href="#"><i class="fas fa-users-cog"></i> Kiểm duyệt Hệ thống</a>
           </li>
         </ul>
       </aside>
       <main class="main-content">
         <header class="topbar">
-          <h2>Quản trị Lõi Hệ Thống</h2>
+          <h2>Bảng điều khiển Tổng (System Dashboard)</h2>
           <div style="display: flex; gap: 15px; align-items: center">
             <span
               id="admin-name"
               style="font-weight: bold; color: var(--primary-color)"
-              >Đang tải...</span
+              >Sếp Tổng</span
             >
             <button
               class="btn btn-outline logout-btn"
@@ -38,24 +38,81 @@
             </button>
           </div>
         </header>
+
         <div class="container" style="padding-top: 30px">
+          <div
+            style="
+              display: flex;
+              gap: 20px;
+              margin-bottom: 30px;
+              flex-wrap: wrap;
+            "
+          >
+            <div
+              class="card"
+              style="
+                flex: 1;
+                text-align: center;
+                border-bottom: 4px solid #3b82f6;
+              "
+            >
+              <h4 style="color: var(--text-muted); margin-bottom: 10px">
+                Tổng Cư dân & Đối tác
+              </h4>
+              <h2 id="stat-users" style="color: #3b82f6; font-size: 2.5rem">
+                0
+              </h2>
+            </div>
+            <div
+              class="card"
+              style="
+                flex: 1;
+                text-align: center;
+                border-bottom: 4px solid #10b981;
+              "
+            >
+              <h4 style="color: var(--text-muted); margin-bottom: 10px">
+                Tổng Tòa nhà / Xóm trọ
+              </h4>
+              <h2 id="stat-buildings" style="color: #10b981; font-size: 2.5rem">
+                0
+              </h2>
+            </div>
+            <div
+              class="card"
+              style="
+                flex: 1;
+                text-align: center;
+                border-bottom: 4px solid #f59e0b;
+              "
+            >
+              <h4 style="color: var(--text-muted); margin-bottom: 10px">
+                Hồ sơ chờ phê duyệt
+              </h4>
+              <h2 id="stat-pending" style="color: #f59e0b; font-size: 2.5rem">
+                0
+              </h2>
+            </div>
+          </div>
+
           <div class="card" style="border-top: 4px solid #8b5cf6">
             <h3 style="margin-bottom: 20px; color: #8b5cf6">
-              <i class="fas fa-list"></i> Danh sách Đối tác cần duyệt
+              <i class="fas fa-shield-alt"></i> Quản lý Tài khoản Toàn Hệ thống
             </h3>
             <div class="table-responsive">
               <table>
                 <thead>
                   <tr>
-                    <th>Email</th>
-                    <th>Loại Tài Khoản</th>
+                    <th>Thông tin Email</th>
+                    <th>Phân quyền</th>
+                    <th>Khu vực (ID)</th>
                     <th>Trạng thái</th>
-                    <th>Thao tác</th>
+                    <th>Thao tác (Quyền Sinh Sát)</th>
                   </tr>
                 </thead>
                 <tbody id="users-tbody">
                   <tr>
-                    <td colspan="4" style="text-align: center">
+                    <td colspan="5" style="text-align: center">
                       Đang tải dữ liệu...
                     </td>
                   </tr>
@@ -79,29 +136,22 @@
         collection,
         getDocs,
         updateDoc,
+        deleteDoc,
       } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-      // CHỐT CHẶN BẢO VỆ TẬN GỐC
       onAuthStateChanged(auth, async (user) => {
         if (!user) return (window.location.href = "login.html");
 
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
           const data = userDoc.data();
-
           if (data.role !== "super_admin" || data.status !== "active") {
-            alert("Cảnh báo: Bạn không có quyền truy cập hệ thống Lõi!");
             window.location.href = "login.html";
             return;
           }
-
-          // Vượt qua ải bảo vệ
           document.getElementById("admin-name").innerText =
             "Sếp: " + (data.name || "Admin");
-          loadUsers();
-        } else {
-          alert("Dữ liệu người dùng không tồn tại (Lệch UID)!");
-          window.location.href = "login.html";
+          loadSystemData();
         }
       });
 
@@ -109,52 +159,109 @@
         .querySelector(".logout-btn")
         .addEventListener("click", () => signOut(auth));
 
-      // Hàm tải danh sách
-      async function loadUsers() {
-        const snap = await getDocs(collection(db, "users"));
+      // Hàm Tải Toàn Bộ Dữ Liệu
+      async function loadSystemData() {
+        // 1. Thống kê Tòa nhà
+        const bldgSnap = await getDocs(collection(db, "building_profiles"));
+        document.getElementById("stat-buildings").innerText = bldgSnap.size;
+
+        // 2. Thống kê & Quản lý User
+        const userSnap = await getDocs(collection(db, "users"));
         const tbody = document.getElementById("users-tbody");
         tbody.innerHTML = "";
-        let count = 0;
 
-        snap.forEach((docSnap) => {
+        let totalUsers = 0;
+        let pendingUsers = 0;
+
+        userSnap.forEach((docSnap) => {
           const item = docSnap.data();
-          if (item.role === "super_admin") return;
+          if (item.role === "super_admin") return; // Không hiển thị mình
 
-          count++;
+          totalUsers++;
+          if (item.status === "pending") pendingUsers++;
+
           let roleName =
             item.role === "admin_motel"
               ? "Chủ Xóm Trọ"
               : item.role === "admin_apartment"
                 ? "BQL Chung Cư"
                 : "Khách Thuê";
+
           const statusBadge =
             item.status === "active"
-              ? '<span class="badge" style="background:#d1fae5;color:#10b981;">Đã cấp quyền</span>'
-              : '<span class="badge" style="background:#fef3c7;color:#d97706;">Đang chờ duyệt</span>';
+              ? '<span class="badge" style="background:#d1fae5;color:#10b981;">Hoạt động</span>'
+              : '<span class="badge" style="background:#fef3c7;color:#d97706;">Đang chờ/Bị Khóa</span>';
 
-          const btn =
-            item.status === "active"
-              ? `<button class="btn btn-outline" disabled style="width: auto; padding: 4px 10px;">Đã duyệt</button>`
-              : `<button class="btn btn-primary btn-duyet" data-id="${docSnap.id}" style="width: auto; padding: 4px 10px; background: #8b5cf6;">Duyệt ngay</button>`;
+          // CỤM NÚT QUYỀN LỰC
+          const btnApprove =
+            item.status !== "active"
+              ? `<button class="btn btn-primary btn-duyet" data-id="${docSnap.id}" style="width: auto; padding: 4px 8px; margin-right: 5px;"><i class="fas fa-check"></i> Duyệt</button>`
+              : `<button class="btn btn-outline btn-khoa" data-id="${docSnap.id}" style="width: auto; padding: 4px 8px; color: #d97706; border-color: #fef3c7; background: #fef3c7; margin-right: 5px;"><i class="fas fa-ban"></i> Khóa</button>`;
+
+          const btnDelete = `<button class="btn btn-outline btn-xoa" data-id="${docSnap.id}" style="width: auto; padding: 4px 8px; color: #ef4444; border-color: #fee2e2; background: #fee2e2;"><i class="fas fa-trash-alt"></i> Xóa</button>`;
 
           tbody.innerHTML += `<tr>
-                    <td><strong>${item.email}</strong></td>
+                    <td><strong>${item.email}</strong><br><small style="color:gray">${item.name || "Chưa cập nhật"}</small></td>
                     <td><strong style="color: var(--primary-color);">${roleName}</strong></td>
+                    <td>${item.building === "none" ? "Chưa rõ" : `<span style="font-size:0.8rem; color:gray">${item.building}</span>`}</td>
                     <td>${statusBadge}</td>
-                    <td>${btn}</td>
+                    <td>${btnApprove} ${btnDelete}</td>
                 </tr>`;
         });
 
-        if (count === 0)
-          tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Chưa có Đối tác nào đăng ký.</td></tr>`;
+        document.getElementById("stat-users").innerText = totalUsers;
+        document.getElementById("stat-pending").innerText = pendingUsers;
 
+        if (totalUsers === 0)
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Hệ thống chưa có người dùng nào.</td></tr>`;
+
+        // GẮN SỰ KIỆN CHO CÁC NÚT
         document.querySelectorAll(".btn-duyet").forEach((btn) => {
           btn.addEventListener("click", async (e) => {
-            const uid = e.target.getAttribute("data-id");
-            btn.innerText = "Đang xử lý...";
-            await updateDoc(doc(db, "users", uid), { status: "active" });
-            alert("Đã cấp quyền!");
-            loadUsers();
+            await updateDoc(
+              doc(
+                db,
+                "users",
+                e.target.closest("button").getAttribute("data-id"),
+              ),
+              { status: "active" },
+            );
+            loadSystemData();
+          });
+        });
+
+        document.querySelectorAll(".btn-khoa").forEach((btn) => {
+          btn.addEventListener("click", async (e) => {
+            if (confirm("Khóa tài khoản này? (Họ sẽ không thể đăng nhập)")) {
+              await updateDoc(
+                doc(
+                  db,
+                  "users",
+                  e.target.closest("button").getAttribute("data-id"),
+                ),
+                { status: "pending" },
+              );
+              loadSystemData();
+            }
+          });
+        });
+
+        document.querySelectorAll(".btn-xoa").forEach((btn) => {
+          btn.addEventListener("click", async (e) => {
+            if (
+              confirm(
+                "Xóa VĨNH VIỄN tài khoản này khỏi Database? Hành động này không thể hoàn tác!",
+              )
+            ) {
+              await deleteDoc(
+                doc(
+                  db,
+                  "users",
+                  e.target.closest("button").getAttribute("data-id"),
+                ),
+              );
+              loadSystemData();
+            }
           });
         });
       }
